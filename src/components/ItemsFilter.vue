@@ -10,8 +10,8 @@
       </div>
 
       <ComparatorSelect
-        v-model:comparison="filter.comparison"
-        v-model:open="filter.open"
+        
+        :filter="filter"
         :filters="filters"
         :comparison-fields="comparisonFields"
         class="comparator-select"
@@ -175,7 +175,7 @@ import ComparatorSelect from './ComparatorSelect.vue'
        }
     },
     mounted() {
-        const token = 'ehf27Xfp7pk99Lk6QCX5GMZLRKzrGheP818rG7wyuImVOerSFWkf7Wsx21qG' // This should be in a .env variable
+        const token = 'EXAMPLE' // This should be in a .env variable
         axios.defaults.headers.common = {'Authorization': `Bearer ${token}`} // I set default token for axios.
     },
     methods: {

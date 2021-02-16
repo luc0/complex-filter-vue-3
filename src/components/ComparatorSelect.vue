@@ -1,16 +1,17 @@
 <template>
-  <div v-if="open"> 
+  <div v-if="filter.open"> 
     <input-comparator
       @change-radio="select($event)"
       @submit-filters="submitFilters()"
-      v-for="comparison in comparisonFields[modelValue.type]"
+      v-for="comparison in comparisonFields[filter.type]"
+      :key="comparison.id"
       :comparison=comparison
-      :filter=modelValue
+      :filter=filter
       :filters=filters
       class="input-comparator"
     ></input-comparator>
 
-    <div class="input-comparator-options" @click.stop="$emit('remove-filter', modelValue)" >
+    <div class="input-comparator-options" @click.stop="$emit('remove-filter', filter)" >
       <a class="btn-warning">
         <i class="fas fa-trash"></i> Delete Filter
       </a>
@@ -27,16 +28,18 @@ import axios from 'axios'
       InputComparator,
     },
     props: {
-      //modelValue: Object,
-      comparison: Object,
-      open: Boolean,
+      filter: Object,
       filters: Array,
       comparisonFields: Array
     },
     methods: {
       select(comparisonId) {
-        this.comparison = comparisonId
-        this.$emit('update:comparison', this.comparison)
+        this.filters.map((filter) => {
+            if (filter.id === this.filter.id) {
+                filter.comparison = comparisonId
+            }
+        });
+        this.$emit('update:filters', this.filters)
 
         const isBoolean = (comparisonId == 'true' || comparisonId == 'false')
         if(isBoolean) {
@@ -58,7 +61,13 @@ import axios from 'axios'
         return data
       },
       toggleFilterEdition() {
-        this.open = !this.open
+        this.filters.map((filter) => {
+            if (filter.id === this.filter.id) {
+                filter.open = open
+                console.log('yes')
+            }
+        });
+        //this.filter.open = !this.filter.open
       },
       async submitFilters() {
         this.toggleFilterEdition()
@@ -70,19 +79,21 @@ import axios from 'axios'
         const page = 1;
         const sortBy = "posted_at"
         const sortDesc = true
-        
-        /* const accounts = await axios.post(`https://igblade.com/api/v3/users/${userId}/accounts/searches`) */
-       
+              
        // TODO: this should be in a config file, for more dinamic urls, (take in account version number.)
-        const posts = await axios.post(`https://igblade.com/api/v3/${platform}/accounts/${account}/posts/searches`, {
-           "filters": this.getFiltersQueryData(),
-           "page": page,
-           "sort_by": sortBy,
-           "sort_desc": sortDesc
-        })
-
-        console.log('posts',posts)
+       // Just for security reasons I hide the site with xxxxx.com, the response is working in the real case.
+        try {
+          const posts = await axios.post(`https://xxxxx.com/api/v3/${platform}/accounts/${account}/posts/searches`, {
+             "filters": this.getFiltersQueryData(),
+             "page": page,
+             "sort_by": sortBy,
+             "sort_desc": sortDesc
+          })
+          console.log('posts', posts)
+        } catch (error) {
+          console.log(error);
+        }
       }
-    },
+    }
   }
 </script>
